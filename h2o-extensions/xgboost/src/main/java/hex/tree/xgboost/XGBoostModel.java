@@ -217,18 +217,31 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
 
   public XGBoostModel(Key<XGBoostModel> selfKey, XGBoostParameters parms, XGBoostOutput output, Frame train, Frame valid) {
     super(selfKey,parms,output);
-    initEffectiveParam();
     final DataInfo dinfo = makeDataInfo(train, valid, _parms, output.nclasses());
     DKV.put(dinfo);
     setDataInfoToOutput(dinfo);
     model_info = new XGBoostModelInfo(parms, dinfo);
   }
 
-  void initEffectiveParam() {
+  @Override
+  public void computeEffectiveParameters() {
     EffectiveParametersUtils.initStoppingMetric(_parms, _effective_parms, _output.isClassifier(), _output.isAutoencoder());
     EffectiveParametersUtils.initCategoricalEncoding(_parms, _effective_parms, _output.nclasses(), Parameters.CategoricalEncodingScheme.OneHotInternal);
     EffectiveParametersUtils.initFoldAssignment(_parms, _effective_parms);
     EffectiveParametersUtils.initDistribution(_parms, _effective_parms, _output.nclasses());
+    _effective_parms._backend = getActualBackend(_parms);
+    _effective_parms._dmatrix_type = _output._sparse ? XGBoostModel.XGBoostParameters.DMatrixType.sparse : XGBoostModel.XGBoostParameters.DMatrixType.dense;
+    //tree_method parameter is evaluated according to https://github.com/h2oai/xgboost/blob/96f61fb3be8c4fa0e160dd6e82677dfd96a5a9a1/src/gbm/gbtree.cc#L127 + we don't 
+    // use external-memory data matrix feature in h2o 
+    if ( _effective_parms._tree_method == XGBoostModel.XGBoostParameters.TreeMethod.auto) {
+        if (H2O.getCloudSize() > 1) {
+            _effective_parms._tree_method =  XGBoostModel.XGBoostParameters.TreeMethod.approx;
+        } else if (_parms.train().numRows() >= (4 << 20)) {
+            _effective_parms._tree_method =  XGBoostModel.XGBoostParameters.TreeMethod.approx;
+        } else {
+            _effective_parms._tree_method =  XGBoostModel.XGBoostParameters.TreeMethod.exact;
+        }
+    }
   }
   
   // useful for debugging

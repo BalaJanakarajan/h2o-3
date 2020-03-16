@@ -70,13 +70,14 @@ public class KMeansModel extends ClusteringModel<KMeansModel,KMeansModel.KMeansP
 
   public KMeansModel(Key selfKey, KMeansParameters parms, KMeansOutput output) { 
     super(selfKey,parms,output);
-    initEffectiveParam();
   }
 
-  void initEffectiveParam() {
-    EffectiveParametersUtils.initFoldAssignment(_parms, _effective_parms);
+  @Override
+  public void computeEffectiveParameters() {
     _effective_parms._distribution = null;
     _effective_parms._stopping_metric = null;
+    EffectiveParametersUtils.initFoldAssignment(_parms, _effective_parms);
+    EffectiveParametersUtils.initCategoricalEncoding(_parms, _effective_parms, _output._categorical_column_count + 1, Model.Parameters.CategoricalEncodingScheme.Enum);
   }
 
   @Override public ModelMetrics.MetricBuilder makeMetricBuilder(String[] domain) {

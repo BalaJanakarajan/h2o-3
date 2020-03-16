@@ -303,9 +303,7 @@ public class DeepLearning extends ModelBuilder<DeepLearningModel,DeepLearningMod
           if (cp != null) cp.unlock(_job);
         }
       }
-      initEffectiveParam(cp);
       trainModel(cp);
-      checkEffectiveParmsDoesNotContainAuto(cp._effective_parms);
       for (Key k : removeMe) DKV.remove(k);
 
       // clean up, but don't delete weights and biases if user asked for export
@@ -328,13 +326,6 @@ public class DeepLearning extends ModelBuilder<DeepLearningModel,DeepLearningMod
       } finally {
         Scope.exit(keep.toArray(new Key[keep.size()]));
       }
-    }
-    
-    void initEffectiveParam(DeepLearningModel deepLearningModel) {
-      deepLearningModel._effective_parms._distribution = deepLearningModel._dist._family;
-      EffectiveParametersUtils.initStoppingMetric(_parms, deepLearningModel._effective_parms, deepLearningModel._output.isClassifier(), deepLearningModel.isSupervised());
-      EffectiveParametersUtils.initCategoricalEncoding(_parms, deepLearningModel._effective_parms, deepLearningModel._output.nclasses(), Model.Parameters.CategoricalEncodingScheme.OneHotInternal);
-      EffectiveParametersUtils.initFoldAssignment(_parms, deepLearningModel._effective_parms);
     }
 
 
