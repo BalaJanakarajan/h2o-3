@@ -12,7 +12,7 @@ from h2o.frame import H2OFrame
 from h2o.utils.typechecks import assert_is_type, Enum, numeric
 
 
-class H2OGamEstimator(H2OEstimator):
+class H2OGeneralizedAdditiveEstimator(H2OEstimator):
     """
     General Additive Model
 
@@ -32,7 +32,7 @@ class H2OGamEstimator(H2OEstimator):
                    "max_runtime_secs", "custom_metric_func", "k", "knots_keys", "gam_X", "bs", "scale", "saveGamCols"}
 
     def __init__(self, **kwargs):
-        super(H2OGamEstimator, self).__init__()
+        super(H2OGeneralizedAdditiveEstimator, self).__init__()
         self._parms = {}
         for pname, pvalue in kwargs.items():
             if pname == 'model_id':
