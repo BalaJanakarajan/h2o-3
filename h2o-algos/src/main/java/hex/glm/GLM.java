@@ -366,8 +366,8 @@ public class GLM extends ModelBuilder<GLMModel,GLMParameters,GLMOutput> {
   public int nclasses() {
     if (_parms._family == Family.multinomial || _parms._family == Family.ordinal)
       return _nclass;
-    if (_parms._family == Family.binomial || _parms._family == Family.quasibinomial 
-            || _parms._family.equals(Family.fractionalbinomial))
+    if (Family.binomial == _parms._family || Family.quasibinomial == _parms._family
+            || Family.fractionalbinomial == _parms._family)
       return 2;
     return 1;
   }
@@ -465,9 +465,12 @@ public class GLM extends ModelBuilder<GLMModel,GLMParameters,GLMOutput> {
 //          if (_nclass != 1) error("_family", H2O.technote(2, "Gaussian requires the response to be numeric."));
           break;
         case fractionalbinomial:
-          Vec resp = (train()).vec(_parms._response_column);
-          if ((resp.min() <0) || (resp.max()>1))
-            error("response", " response must be between 0 and 1 for fractional_binomial family.");
+          final Vec resp = (train()).vec(_parms._response_column);
+          if ((resp.min() < 0) || (resp.max() > 1)) {
+            error("response",
+                    String.format("Response '%s' must be between 0 and 1 for fractional_binomial family. Min: %f, Max: %f",
+                            _parms._response_column, resp.min(), resp.max()));
+          }
           break;
         default:
           error("_family", "Invalid distribution: " + _parms._distribution);

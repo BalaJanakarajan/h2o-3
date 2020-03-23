@@ -1050,8 +1050,8 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
   @Override
   protected String[][] scoringDomains(){
     String [][] domains = _output._domains;
-    if((_parms._family == Family.binomial || _parms._family == Family.quasibinomial || 
-            _parms._family==Family.fractionalbinomial)
+    if ((_parms._family == Family.binomial || _parms._family == Family.quasibinomial ||
+            _parms._family == Family.fractionalbinomial)
             && _output._domains[_output._dinfo.responseChunkId(0)] == null) {
       domains = domains.clone();
       domains[_output._dinfo.responseChunkId(0)] = binomialClassNames;
@@ -1216,8 +1216,8 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
         _random_column_names = Arrays.copyOf(glm._randomColNames, glm._randomColNames.length);
       }
       _coefficient_names[_coefficient_names.length-1] = "Intercept";
-      _binomial = (glm._parms._family == Family.binomial || glm._parms._family == Family.quasibinomial || 
-              glm._parms._family.equals(Family.fractionalbinomial));
+      _binomial = (glm._parms._family == Family.binomial || glm._parms._family == Family.quasibinomial ||
+              Family.fractionalbinomial == glm._parms._family);
       _nclasses = glm.nclasses();
       _multinomial = glm._parms._family == Family.multinomial;
       _ordinal = (glm._parms._family == Family.ordinal);
